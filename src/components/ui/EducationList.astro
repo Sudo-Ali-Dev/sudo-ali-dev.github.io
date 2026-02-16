@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from "astro:content";
+import EducationItem from "./EducationItem.astro";
+
+interface Props {
+  education: CollectionEntry<"education">[];
+}
+
+const { education } = Astro.props;
+---
+
+<ul class="space-y-4">
+  {
+    education.map((edu, index) => (
+      <li>
+        <EducationItem education={edu} />
+        {index < education.length - 1 && <hr class="border-border mt-4" />}
+      </li>
+    ))
+  }
+</ul>

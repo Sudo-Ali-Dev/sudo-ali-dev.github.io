@@ -1,0 +1,7 @@
+{
+  "year": 2023,
+  "title": "E-commerce Platform",
+  "technologies": ["Next.js", "Tailwind", "PostgreSQL"],
+  "github": "https://github.com/yourusername/ecommerce",
+  "live": "https://mystore.example.com"
+}
