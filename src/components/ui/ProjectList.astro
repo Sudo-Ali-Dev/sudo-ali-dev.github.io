@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ProjectItem from "./ProjectItem.astro";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+
+const { projects } = Astro.props;
+---
+
+<ul class="space-y-4">
+  {
+    projects.map((project, index) => (
+      <li>
+        <ProjectItem project={project} />
+        {index < projects.length - 1 && <hr class="border-border mt-4" />}
+      </li>
+    ))
+  }
+</ul>

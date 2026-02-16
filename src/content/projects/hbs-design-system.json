@@ -1,0 +1,7 @@
+{
+  "year": 2022,
+  "title": "Harvard Business School Design System",
+  "technologies": ["Storybook", "React", "TypeScript"],
+  "github": "https://github.com/yourusername/hbs-design-system",
+  "live": "https://hbs-design-system.example.com"
+}
