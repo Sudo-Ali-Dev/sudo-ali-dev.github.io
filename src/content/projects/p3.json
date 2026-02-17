@@ -1,6 +1,0 @@
-{
-  "year": 2021,
-  "title": "AI Chat Application",
-  "technologies": ["Astro", "Claude API", "TypeScript"],
-  "github": "https://github.com/yourusername/ai-chat"
-}

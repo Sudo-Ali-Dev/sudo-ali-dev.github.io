@@ -46,16 +46,16 @@ const projects: Array<{
   icon: string;
 }> = [
   {
-    title: "Coming",
-    description: "#",
-    link: "#",
-    icon: "💻",
+    title: "todo-cli",
+    description: "Command-line todo manager using JSON for storage, built with Python.",
+    link: "https://github.com/Sudo-Ali-Dev/todo-cli",
+    icon: ">_",
   },
   {
-    title: "Another Project",
-    description: "Add your own projects here",
-    icon: "💻",
-    link: "",
+    title: "GitTracker",
+    description: "A simple CLI tool that fetches and displays the recent activity of any GitHub user using the GitHub API.",
+    icon: "🛰️",
+    link: "https://github.com/Sudo-Ali-Dev/GitTracker",
   },
 ];
 ---
@@ -157,7 +157,7 @@ const projects: Array<{
 
     <section id="projects" class="mt-2">
       <Card class="text-secondary" role="region" aria-label="Project showcase">
-        <SectionHeading>💻 <DecryptText  text=" your projects" speed={40} /></SectionHeading>
+        <SectionHeading>💻 <DecryptText  text=" my projects" speed={40} /></SectionHeading>
         <div class="space-y-2" role="list">
           {
             projects.map((project, index) => (
