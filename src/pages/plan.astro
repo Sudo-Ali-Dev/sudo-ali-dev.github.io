@@ -250,7 +250,13 @@ const treeLayout = d3.tree<NodeData>()
             if (!isMobile) tooltip.style.opacity = '0';
         })
         // Click to collapse/expand branch
-        .on('click', function(_: any, d: any) {
+        .on('click', handleToggle)
+        .on('touchend', function(event: TouchEvent, d: any) {
+          event.preventDefault(); // stops the delayed mouse event firing after touch
+          handleToggle.call(this, event, d);
+        });
+
+        function handleToggle(_: any, d: any) {
           if (d.depth !== 1) return;
           if (d.children) {
             (d as any)._children = d.children;
@@ -260,7 +266,7 @@ const treeLayout = d3.tree<NodeData>()
             (d as any)._children = undefined;
           }
           update(true);
-        });
+        }
 
       // Replace the node transition block
       const nodeUpdate = nodeEnter.merge(nodes as any);
