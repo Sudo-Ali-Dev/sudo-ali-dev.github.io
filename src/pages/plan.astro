@@ -6,17 +6,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
-    <svg id="mindmap" style="width:100%;height:100%;"></svg>
-  </div>
+    <style>
+      svg#mindmap {
+        touch-action: pan-x pan-y;
+      }
+    </style>
+
+<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;">
+  <svg id="mindmap" style="width:100%;height:100%; pointer-events: all;"></svg>
+</div>
 
   <!-- Controls -->
 <div style="position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: row; align-items: center; gap: 0.75rem; white-space: nowrap;">
-<div id="hint" class="text-xs bg-black/40 backdrop-blur px-3 py-1.5 rounded-full" style="color: var(--color-muted);">    Pinch · Tap
+  <div id="hint" class="text-xs backdrop-blur-md px-3 py-1.5 rounded-full" style="color: var(--color-muted); background: color-mix(in srgb, var(--color-surface) 60%, transparent); border: 1px solid color-mix(in srgb, var(--color-muted) 20%, transparent);">
+    Pinch · Tap
   </div>
-<button id="reset-btn"
-  class="text-xs bg-black/50 backdrop-blur px-3 py-1.5 rounded-full hover:bg-black/70 transition-colors"
-  style="color: var(--color-secondary); border: 1px solid rgba(255,255,255,0.15);">
+  <button id="reset-btn"
+    class="text-xs backdrop-blur-md px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity"
+    style="color: var(--color-secondary); background: color-mix(in srgb, var(--color-surface) 60%, transparent); border: 1px solid color-mix(in srgb, var(--color-muted) 20%, transparent);">
     ⟳ Reset
   </button>
 </div>
@@ -146,6 +153,7 @@ const treeLayout = d3.tree<NodeData>()
         .attr('stroke-width', (d: any) => d.target.depth === 1 ? 2.5 : 1.5)
         .attr('stroke', (d: any) => DARK_COLORS[getBranchIdx(d.target) % DARK_COLORS.length])
         .attr('stroke-linecap', 'round');
+
 
       // Replace the link transition block
       const linkUpdate = linkEnter.merge(links as any);
@@ -330,16 +338,16 @@ if (!isMobile) {
       .style('opacity', 1);
 
     // Reset button
-    document.getElementById('reset-btn')!.addEventListener('click', () => {
-      svg.transition().duration(600).ease(d3.easeCubicOut)
-        .call(zoomBehavior.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(1));
-    });
+      document.getElementById('reset-btn')!.addEventListener('click', () => {
+        svg.transition().duration(600).ease(d3.easeCubicOut)
+          .call(zoomBehavior.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(mobileScale));
+      });
 
     // Resize
     window.addEventListener('resize', () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      radius = Math.min(width, height) * 0.36;
+      radius = Math.min(width, height) * 0.60;
       treeLayout.size([2 * Math.PI, radius]);
       g.attr('transform', `translate(${width / 2}, ${height / 2})`);
       update(false);
