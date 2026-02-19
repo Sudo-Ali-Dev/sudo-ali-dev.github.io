@@ -12,12 +12,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   <!-- Controls -->
 <div style="position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: row; align-items: center; gap: 0.75rem; white-space: nowrap;">
-  <div id="hint" class="text-xs text-gray-400 bg-black/40 backdrop-blur px-3 py-1.5 rounded-full">
-    Pinch · Tap
+<div id="hint" class="text-xs bg-black/40 backdrop-blur px-3 py-1.5 rounded-full" style="color: var(--color-muted);">    Pinch · Tap
   </div>
-  <button id="reset-btn"
-    class="text-xs text-gray-300 bg-black/50 backdrop-blur px-3 py-1.5 rounded-full hover:bg-black/70 transition-colors"
-    style="border: 1px solid rgba(255,255,255,0.15);">
+<button id="reset-btn"
+  class="text-xs bg-black/50 backdrop-blur px-3 py-1.5 rounded-full hover:bg-black/70 transition-colors"
+  style="color: var(--color-secondary); border: 1px solid rgba(255,255,255,0.15);">
     ⟳ Reset
   </button>
 </div>
@@ -175,12 +174,14 @@ const treeLayout = d3.tree<NodeData>()
         const w = isRoot ? 120 : isBranch ? 128 : 118;
         const h = isRoot ? 58 : lines.length > 1 ? 50 : 36;
 
-        // Shadow rect
-        el.append('rect')
-          .attr('x', -w / 2 + 2).attr('y', -h / 2 + 3)
-          .attr('width', w).attr('height', h)
-          .attr('rx', 14).attr('ry', 14)
-          .attr('fill', 'rgba(0,0,0,0.15)');
+        // Shadow rect — skip on mobile for performance
+        if (!isMobile) {
+          el.append('rect')
+            .attr('x', -w / 2 + 2).attr('y', -h / 2 + 3)
+            .attr('width', w).attr('height', h)
+            .attr('rx', 14).attr('ry', 14)
+            .attr('fill', 'rgba(0,0,0,0.15)');
+        }
 
         // Main rect
         el.append('rect').attr('class', 'node-rect')
@@ -191,9 +192,9 @@ const treeLayout = d3.tree<NodeData>()
           .attr('stroke', 'rgba(255,255,255,0.7)')
           .attr('stroke-width', isRoot ? 2.5 : 1.5);
 
-        if (isRoot) {
-          el.select('.node-rect').style('filter', 'url(#pulse)');
-        }
+          if (isRoot && !isMobile) {
+            el.select('.node-rect').style('filter', 'url(#pulse)');
+          }
 
         lines.forEach((line: string, i: number) => {
           el.append('text')
@@ -287,6 +288,10 @@ const treeLayout = d3.tree<NodeData>()
     }
 
 const isMobile = window.innerWidth < 768;
+if (isMobile) {
+  svg.style('will-change', 'transform');
+  g.style('will-change', 'transform');
+}
 
 // Auto-collapse all branches on mobile
 if (isMobile) {
