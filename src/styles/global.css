@@ -49,6 +49,5 @@ a:hover svg {
 }
 
 svg#mindmap {
-  touch-action: pan-x pan-y;
-  transform: none !important;
+  touch-action: manipulation;
 }
