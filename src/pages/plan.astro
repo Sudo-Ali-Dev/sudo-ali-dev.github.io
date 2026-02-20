@@ -119,7 +119,7 @@ import DecryptText from "../components/DecryptText.astro";
     svg.call(zoomBehavior);
 
     const root = d3.hierarchy<NodeData>(root_data);
-let radius = Math.min(width, height) * 0.60;
+    let radius = Math.min(width, height) * 0.50;
 
 const treeLayout = d3.tree<NodeData>()
   .size([2 * Math.PI, radius])
@@ -313,7 +313,7 @@ if (isMobile) {
 }
 
 // Zoom out more on mobile so all 8 nodes fit
-const mobileScale = isMobile ? 0.6 : .8;
+const mobileScale = isMobile ? 1 : .8;
 g.attr('transform', `translate(${width / 2}, ${height / 2})`);
 svg.call(
   zoomBehavior.transform,
@@ -350,7 +350,7 @@ if (!isMobile) {
     window.addEventListener('resize', () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      radius = Math.min(width, height) * 0.60;
+      radius = Math.min(width, height) * 0.40;
       treeLayout.size([2 * Math.PI, radius]);
       g.attr('transform', `translate(${width / 2}, ${height / 2})`);
       update(false);
