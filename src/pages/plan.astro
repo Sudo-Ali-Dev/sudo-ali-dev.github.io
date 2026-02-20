@@ -356,26 +356,11 @@ if (!isMobile) {
       update(false);
     });
 
-let tabSwitched = false;
-
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    tabSwitched = true;
+  if (document.visibilityState === 'visible' && isMobile) {
+    document.getElementById('reset-btn')!.click();
   }
 });
-
-document.addEventListener('touchstart', () => {
-  if (tabSwitched) {
-    tabSwitched = false;
-    width = window.innerWidth;
-    height = window.innerHeight;
-    svg.call(
-      zoomBehavior.transform,
-      d3.zoomIdentity.translate(width / 2, height / 2).scale(mobileScale)
-    );
-  }
-}, { passive: true });
-
   </script>
 
 </BaseLayout>
