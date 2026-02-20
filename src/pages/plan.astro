@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import DecryptText from "../components/DecryptText.astro";
+
 ---
 
 <BaseLayout title="My 2026 Plan">
@@ -26,6 +28,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     style="color: var(--color-secondary); background: color-mix(in srgb, var(--color-surface) 60%, transparent); border: 1px solid color-mix(in srgb, var(--color-muted) 20%, transparent);">
     ⟳ Reset
   </button>
+</div>
+<div class="hidden sm:block" style="position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 10;">
+  <h2 class="text-sm font-bold font-mono" style="color: var(--color-primary);">
+    <span style="color: var(--color-accent); font-size: 1.1rem;">&gt;_</span> <span style="font-family: Nunito, sans-serif;"><DecryptText text="Learning Roadmap" speed={60}/></span>
+  </h2>
 </div>
 
   <!-- Tooltip -->
@@ -296,10 +303,6 @@ const treeLayout = d3.tree<NodeData>()
     }
 
 const isMobile = window.innerWidth < 768;
-if (isMobile) {
-  svg.style('will-change', 'transform');
-  g.style('will-change', 'transform');
-}
 
 // Auto-collapse all branches on mobile
 if (isMobile) {
@@ -343,7 +346,7 @@ if (!isMobile) {
           .call(zoomBehavior.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(mobileScale));
       });
 
-    // Resize
+// Resize
     window.addEventListener('resize', () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -352,6 +355,27 @@ if (!isMobile) {
       g.attr('transform', `translate(${width / 2}, ${height / 2})`);
       update(false);
     });
+
+let tabSwitched = false;
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    tabSwitched = true;
+  }
+});
+
+document.addEventListener('touchstart', () => {
+  if (tabSwitched) {
+    tabSwitched = false;
+    width = window.innerWidth;
+    height = window.innerHeight;
+    svg.call(
+      zoomBehavior.transform,
+      d3.zoomIdentity.translate(width / 2, height / 2).scale(mobileScale)
+    );
+  }
+}, { passive: true });
+
   </script>
 
 </BaseLayout>

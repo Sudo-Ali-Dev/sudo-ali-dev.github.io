@@ -25,18 +25,18 @@ const allEducation = await getCollection("education");
 const allEducationByDate = allEducation.sort((a, b) => b.data.startYear - a.data.startYear);
 
 const techStack: Record<string, string> = {
-  js: "JavaScript",
-  ts: "TypeScript",
-  "node.js": "Node",
-  astro: "This site is built on astro",
-  python: "Python",
-  sql: "SQL",
-  "claude-code": "Best tool ever",
-  "next.js": "Next.js",
-  aws: "AWS",
-  gcp: "GCP",
-  docker: "Docker",
-  tf: "Terraform",
+python: "python — my go-to",
+c: "c — it hurts",
+cpp: "c++ — it still hurts",
+git: "git — push and hope",
+astro: "astro — built this with it",
+node: "node — barely counts",
+html: "html/css — obviously",
+"claude-code": "claude code — my unpaid intern",
+gcp: "gcp — cloud stuff, I figure it out",
+wordpress: "wordpress — did this for a year",
+woocommerce: "woocommerce — never again",
+shopify: "shopify — never again x2",
 };
 
 const projects: Array<{
@@ -92,7 +92,7 @@ const projects: Array<{
             <!-- Personal paragraph -->
             <div class="bg-gray-200/50 dark:bg-gray-500/10 rounded-lg p-3 mb-4">
               <p class="text-primary leading-relaxed">
-                I love dark mode, open source, and Machine Learning related projects. When I'm not working, I like reading books, watching movies, and itching my curiosity.
+                Every developer has an origin story. Mine began when a semicolon ruined my entire weekend. Since then, I’ve dedicated my life to revenge — by becoming an entry-level software developer.
               </p>
             </div>
 
@@ -100,14 +100,14 @@ const projects: Array<{
 
             <InfoRow label="location">the internet 🛜</InfoRow>
 
-            <InfoRow label="main hobby"> vibecoding </InfoRow>
+            <InfoRow label="main hobby"> learning computers… before they learn me </InfoRow>
 
             <InfoRow label="current focus">
               <ExternalLink
                 href="/plan"
-                label="One, Big, Beautiful Plan (My Edition)"
+                label="One, Big, Beautiful Bill (My Edition)"
               >
-                One, Big, Beautiful Plan (My Edition)
+                One, Big, Beautiful Bill (My Edition)
               </ExternalLink>
             </InfoRow>
 
@@ -138,8 +138,8 @@ const projects: Array<{
                   {
                     Object.keys(techStack).map((lang) => (
                       <span
-                        class="text-secondary hover:text-accent transition-colors"
-                        title={techStack[lang]}
+                        class="tooltip text-secondary hover:text-accent transition-colors"
+                        data-tooltip={techStack[lang]}
                       >
                         {lang}
                       </span>
