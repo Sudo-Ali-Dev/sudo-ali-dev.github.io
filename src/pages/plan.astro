@@ -119,6 +119,11 @@ import DecryptText from "../components/DecryptText.astro";
     svg.call(zoomBehavior);
 
     const root = d3.hierarchy<NodeData>(root_data);
+    const isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+      g.style('will-change', 'transform');
+    }    
     let radius = Math.min(width, height) * .6;
 
 const treeLayout = d3.tree<NodeData>()
@@ -302,7 +307,6 @@ const treeLayout = d3.tree<NodeData>()
       nodes.exit().transition().duration(300).style('opacity', 0).remove();
     }
 
-const isMobile = window.innerWidth < 768;
 
 // Auto-collapse all branches on mobile
 if (isMobile) {
