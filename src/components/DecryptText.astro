@@ -6,6 +6,7 @@ interface Props {
   delay?: number;
   chars?: string;
   autoRepeat?: boolean;
+  trigger?: 'auto' | 'hover';
 }
 
 const { 
@@ -14,7 +15,8 @@ const {
   speed = 50, 
   delay = 0,
   chars = '-_/\\|',
-  autoRepeat = true
+  autoRepeat = true,
+  trigger = 'auto'
 } = Astro.props;
 ---
 
@@ -25,6 +27,7 @@ const {
   data-delay={delay}
   data-chars={chars}
   data-auto-repeat={autoRepeat}
+  data-trigger={trigger}
 >
   {text}
 </span>
@@ -59,11 +62,21 @@ const {
       this.init();
     }
 
-    init() {
-      setTimeout(() => {
-        this.setText(this.originalText);
-      }, this.delay);
-    }
+init() {
+  if (this.element.dataset.trigger === 'hover') {
+    const parent = this.element.closest('.group');
+    parent?.addEventListener('mouseenter', () => {
+      if (this.frameRequest) cancelAnimationFrame(this.frameRequest);
+      if (this.repeatTimeout) clearTimeout(this.repeatTimeout);
+      this.element.textContent = '';
+      this.setText(this.originalText);
+    });
+  } else {
+    setTimeout(() => {
+      this.setText(this.originalText);
+    }, this.delay);
+  }
+}
 
     setText(newText: string) {
       const oldText = this.element.innerText;
