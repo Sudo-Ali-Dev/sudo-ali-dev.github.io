@@ -26,6 +26,12 @@ export const NAV_LINKS: NavLink[] = [
     tooltip: "Things I've built",
   },
   {
+    title: "know-me.ai",
+    id: "know-me",
+    url: "/know-me",
+    tooltip: "Talk to digital Ali",
+  },
+  {
     title: "resume.pdf",
     redirect: "https://drive.google.com/file/d/1a2Ivnwd5wGrSoLbTPJtswdSOdLfqAVUF/view?usp=sharing",
     tooltip: "A very interesting page",

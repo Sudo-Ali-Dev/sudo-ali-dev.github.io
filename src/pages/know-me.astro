@@ -1,0 +1,200 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Card from "../components/ui/Card.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import TerminalPrompt from "../components/ui/TerminalPrompt.astro";
+import DecryptText from "../components/DecryptText.astro";
+---
+
+<BaseLayout title="Know Me" navbarActiveItemID="know-me">
+  <section aria-label="Know Me">
+    <Card>
+      <SectionHeading as="h1">
+        🤖 <DecryptText text="Know Me" speed={40} />
+      </SectionHeading>
+
+      <p class="text-muted text-xs mb-4">
+        A digital version of me — ask anything you'd ask the real Ali.
+      </p>
+
+      <div
+        id="bot-container"
+        class="min-h-[60vh] rounded-md border border-gray-400/30 dark:border-gray-600/30 bg-white/40 dark:bg-black/20 flex flex-col"
+      >
+        <!-- Chat messages -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-3">
+          <div class="text-center py-8">
+            <p class="text-muted text-xs mb-3 font-mono">~/ali $ whoami</p>
+            <p class="text-secondary text-sm font-mono">Hey. I am Ali.</p>
+            <p class="text-muted text-xs mt-1 font-mono">Ask me anything — type below.</p>
+            <div id="starters" class="flex flex-wrap gap-2 justify-center mt-4">
+              <button class="starter text-xs font-mono px-3 py-1.5 rounded border border-gray-400/30 dark:border-gray-600/30 text-muted hover:text-secondary hover:border-accent/50 transition-colors cursor-pointer bg-transparent" data-msg="Who are you?">who_are_you</button>
+              <button class="starter text-xs font-mono px-3 py-1.5 rounded border border-gray-400/30 dark:border-gray-600/30 text-muted hover:text-secondary hover:border-accent/50 transition-colors cursor-pointer bg-transparent" data-msg="Tell me about the health bot you built.">health_bot</button>
+              <button class="starter text-xs font-mono px-3 py-1.5 rounded border border-gray-400/30 dark:border-gray-600/30 text-muted hover:text-secondary hover:border-accent/50 transition-colors cursor-pointer bg-transparent" data-msg="What advice would you give to someone starting to learn programming?">advice</button>
+              <button class="starter text-xs font-mono px-3 py-1.5 rounded border border-gray-400/30 dark:border-gray-600/30 text-muted hover:text-secondary hover:border-accent/50 transition-colors cursor-pointer bg-transparent" data-msg="How can I contact you?">contact</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="border-t border-gray-400/30 dark:border-gray-600/30 p-3">
+          <form id="chat-form" class="flex gap-2 items-end">
+            <span class="text-accent text-xs font-mono shrink-0 pt-1.5">$</span>
+            <textarea
+              id="user-input"
+              class="flex-1 bg-transparent border-none outline-none text-secondary text-sm font-mono resize-none placeholder:text-muted/50"
+              placeholder="ask ali something..."
+              rows="1"
+              autocomplete="off"
+            ></textarea>
+            <button
+              type="submit"
+              id="send-btn"
+              class="text-xs font-mono px-3 py-1.5 rounded border border-accent/50 text-accent hover:bg-accent/10 transition-colors cursor-pointer bg-transparent shrink-0"
+            >
+              run
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <TerminalPrompt command="./ali --interactive" />
+    </Card>
+  </section>
+</BaseLayout>
+
+<script>
+  const API_URL = 'https://ali-bot-topaz.vercel.app/api/chat';
+
+  const chatMessages = document.getElementById('chat-messages')!;
+  const form = document.getElementById('chat-form') as HTMLFormElement;
+  const input = document.getElementById('user-input') as HTMLTextAreaElement;
+  const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
+
+  type Msg = { role: 'user' | 'assistant'; content: string };
+  const history: Msg[] = [];
+  let busy = false;
+
+  function autoResize() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+  }
+  input.addEventListener('input', autoResize);
+
+  function addMessage(role: 'user' | 'ali', text: string) {
+    removeWelcome();
+    const div = document.createElement('div');
+    div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user'
+      ? 'max-w-[80%] text-sm font-mono px-3 py-2 rounded bg-accent/15 text-secondary border border-accent/30'
+      : 'max-w-[80%] text-sm font-mono px-3 py-2 rounded bg-white/30 dark:bg-white/5 text-secondary border border-gray-400/20 dark:border-gray-600/20';
+    bubble.textContent = text;
+    bubble.style.animation = 'fadeUp 0.2s ease';
+
+    div.appendChild(bubble);
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeWelcome() {
+    const starters = document.getElementById('starters');
+    const welcome = starters?.closest('.text-center');
+    if (welcome) welcome.remove();
+  }
+
+  function showTyping() {
+    removeWelcome();
+    const div = document.createElement('div');
+    div.className = 'flex justify-start';
+    div.id = 'typing';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'text-sm font-mono px-3 py-2 rounded bg-white/30 dark:bg-white/5 border border-gray-400/20 dark:border-gray-600/20 text-muted';
+    bubble.innerHTML = '<span class="typing-dots">thinking<span>.</span><span>.</span><span>.</span></span>';
+
+    div.appendChild(bubble);
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function hideTyping() {
+    document.getElementById('typing')?.remove();
+  }
+
+  async function send(text: string) {
+    if (busy || !text.trim()) return;
+    busy = true;
+    sendBtn.disabled = true;
+
+    const userText = text.trim();
+    addMessage('user', userText);
+    history.push({ role: 'user', content: userText });
+
+    input.value = '';
+    input.style.height = 'auto';
+
+    showTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+      });
+      const data = await res.json();
+      hideTyping();
+
+      if (data.reply) {
+        addMessage('ali', data.reply);
+        history.push({ role: 'assistant', content: data.reply });
+      } else {
+        addMessage('ali', data.error ?? 'Something went wrong.');
+      }
+    } catch {
+      hideTyping();
+      addMessage('ali', 'Could not reach the server. Try again later.');
+    }
+
+    busy = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    send(input.value);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send(input.value);
+    }
+  });
+
+  document.querySelectorAll('.starter').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const msg = (btn as HTMLElement).dataset.msg;
+      if (msg) send(msg);
+    });
+  });
+</script>
+
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .typing-dots span {
+    animation: blink 1.4s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%, 60%, 100% { opacity: 0.3; }
+    30% { opacity: 1; }
+  }
+  textarea::-webkit-scrollbar { display: none; }
+</style>
