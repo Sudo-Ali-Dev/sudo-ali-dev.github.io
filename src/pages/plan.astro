@@ -10,12 +10,18 @@ import DecryptText from "../components/DecryptText.astro";
 
     <style>
       svg#mindmap {
-        touch-action: pan-x pan-y;
+        touch-action: none;
+      }
+
+      /* Ripple expand animation */
+      @keyframes rippleExpand {
+        0% { r: 5; opacity: 0.6; }
+        100% { r: 50; opacity: 0; }
       }
     </style>
 
 <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: auto;">
-  <svg id="mindmap" style="width:100%;height:100%; cursor: grab; touch-action: none;"></svg>
+  <svg id="mindmap" style="width:100%;height:100%; cursor: grab;"></svg>
 </div>
 
   <!-- Controls -->
@@ -56,6 +62,11 @@ import DecryptText from "../components/DecryptText.astro";
       '#e07070', '#e0a850', '#60b060', '#5090d0',
       '#9060d0', '#d060a0', '#50c0a0', '#d0a060',
     ];
+    // Glow-shadow colors per branch (semi-transparent for drop-shadow)
+    const GLOW_COLORS = [
+      'rgba(224,112,112,0.45)', 'rgba(224,168,80,0.45)', 'rgba(96,176,96,0.45)', 'rgba(80,144,208,0.45)',
+      'rgba(144,96,208,0.45)', 'rgba(208,96,160,0.45)', 'rgba(80,192,160,0.45)', 'rgba(208,160,96,0.45)',
+    ];
 
     interface NodeData { name: string; children?: NodeData[]; _children?: NodeData[]; }
 
@@ -91,7 +102,7 @@ import DecryptText from "../components/DecryptText.astro";
 
     const tooltip = document.getElementById('tooltip')!;
     const svg = d3.select<SVGSVGElement, unknown>('#mindmap');
-    
+
     // Transparent rect to catch zoom and pan events in Chrome
     svg.append('rect')
       .attr('width', '100%')
@@ -101,8 +112,10 @@ import DecryptText from "../components/DecryptText.astro";
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    // Defs for glow filter and gradients
+    // Defs for filters and gradients
     const defs = svg.append('defs');
+
+    // Glow filter for hover
     defs.append('filter').attr('id', 'glow')
       .append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'blur')
       .select(function() { return this.parentNode as Element; })
@@ -110,12 +123,14 @@ import DecryptText from "../components/DecryptText.astro";
       .data(['blur', 'SourceGraphic']).join('feMergeNode')
       .attr('in', (d: string) => d);
 
-    // Root node pulse filter
-    const pulseFilter = defs.append('filter').attr('id', 'pulse');
-    pulseFilter.append('feGaussianBlur').attr('stdDeviation', '6').attr('result', 'blur');
-    pulseFilter.append('feMerge').selectAll('feMergeNode')
-      .data(['blur', 'SourceGraphic']).join('feMergeNode')
-      .attr('in', (d: string) => d);
+    // Create gradient defs for each branch link (parent → child color)
+    DARK_COLORS.forEach((color, i) => {
+      const grad = defs.append('linearGradient')
+        .attr('id', `link-grad-${i}`)
+        .attr('gradientUnits', 'userSpaceOnUse');
+      grad.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0.8);
+      grad.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0.25);
+    });
 
     const g = svg.append('g');
 
@@ -130,15 +145,15 @@ import DecryptText from "../components/DecryptText.astro";
 
     if (isMobile) {
       g.style('will-change', 'transform');
-    }    
+    }
     let radius = Math.min(width, height) * .6;
 
-const treeLayout = d3.tree<NodeData>()
-  .size([2 * Math.PI, radius])
-  .separation((a: any, b: any) => {
-    if (a.depth === 1) return a.parent === b.parent ? 2.2 : 3.5;
-    return a.parent === b.parent ? 1.2 : 2.5;
-  });
+    const treeLayout = d3.tree<NodeData>()
+      .size([2 * Math.PI, radius])
+      .separation((a: any, b: any) => {
+        if (a.depth === 1) return a.parent === b.parent ? 2.2 : 3.5;
+        return a.parent === b.parent ? 1.2 : 2.5;
+      });
 
     // Get branch index for color
     const getBranchIdx = (d: any): number => {
@@ -156,8 +171,26 @@ const treeLayout = d3.tree<NodeData>()
         : palette[idx % palette.length] + (dark ? '' : 'cc');
     };
 
+    // Ripple group sits above links but below nodes
     let linkGroup = g.append('g').attr('class', 'links');
+    let rippleGroup = g.append('g').attr('class', 'ripples');
     let nodeGroup = g.append('g').attr('class', 'nodes');
+
+    // --- Ripple effect on click ---
+    function spawnRipple(x: number, y: number, color: string) {
+      const ripple = rippleGroup.append('circle')
+        .attr('cx', x).attr('cy', y)
+        .attr('r', 5)
+        .attr('fill', 'none')
+        .attr('stroke', color)
+        .attr('stroke-width', 2)
+        .attr('opacity', 0.6);
+      ripple.transition().duration(600).ease(d3.easeCubicOut)
+        .attr('r', 55)
+        .attr('opacity', 0)
+        .attr('stroke-width', 0.5)
+        .remove();
+    }
 
     function update(animate = false) {
       treeLayout(root as any);
@@ -169,19 +202,53 @@ const treeLayout = d3.tree<NodeData>()
       const linkEnter = links.enter().append('path').attr('class', 'link')
         .attr('fill', 'none')
         .attr('stroke-opacity', 0)
-        .attr('stroke-width', (d: any) => d.target.depth === 1 ? 2.5 : 1.5)
-        .attr('stroke', (d: any) => DARK_COLORS[getBranchIdx(d.target) % DARK_COLORS.length])
+        .attr('stroke-width', (d: any) => d.target.depth === 1 ? 3 : 1.8)
+        .attr('stroke', (d: any) => `url(#link-grad-${getBranchIdx(d.target) % DARK_COLORS.length})`)
         .attr('stroke-linecap', 'round');
 
+      // Animate link drawing with stroke-dasharray
+      if (animate) {
+        linkEnter.each(function() {
+          const pathEl = this as SVGPathElement;
+          // We need to set the d attribute first so getTotalLength works
+          // This will be set in the merge below, but for entering links
+          // we do the dash animation after merge
+        });
+      }
 
-      // Replace the link transition block
       const linkUpdate = linkEnter.merge(links as any);
-      (animate ? (linkUpdate.transition().duration(500).ease(d3.easeCubicOut) as any) : (linkUpdate as any))
-        .attr('stroke-opacity', 0.55)
-        .attr('d', (d: any) =>
-          d3.linkRadial<any, any>().angle((n: any) => n.x).radius((n: any) => n.y)(d));
 
-      links.exit().transition().duration(300).attr('stroke-opacity', 0).remove();
+      if (animate) {
+        linkUpdate.transition().duration(600).ease(d3.easeCubicOut)
+          .attr('stroke-opacity', 0.7)
+          .attr('d', (d: any) =>
+            d3.linkRadial<any, any>().angle((n: any) => n.x).radius((n: any) => n.y)(d));
+
+        // Animate newly entering links with stroke-dasharray draw-in
+        linkEnter
+          .attr('d', (d: any) =>
+            d3.linkRadial<any, any>().angle((n: any) => n.x).radius((n: any) => n.y)(d))
+          .attr('stroke-opacity', 0.7)
+          .each(function() {
+            const pathEl = this as SVGPathElement;
+            const len = pathEl.getTotalLength();
+            d3.select(pathEl)
+              .attr('stroke-dasharray', `${len} ${len}`)
+              .attr('stroke-dashoffset', len)
+              .transition().duration(700).ease(d3.easeCubicOut)
+              .attr('stroke-dashoffset', 0)
+              .on('end', function() {
+                d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+              });
+          });
+      } else {
+        linkUpdate
+          .attr('stroke-opacity', 0.7)
+          .attr('d', (d: any) =>
+            d3.linkRadial<any, any>().angle((n: any) => n.x).radius((n: any) => n.y)(d));
+      }
+
+      links.exit().transition().duration(400).attr('stroke-opacity', 0).remove();
 
       // --- Nodes ---
       const nodes = nodeGroup.selectAll<SVGGElement, any>('g.node')
@@ -192,36 +259,46 @@ const treeLayout = d3.tree<NodeData>()
         .style('opacity', 0)
         .style('cursor', (d: any) => d.depth > 0 && d.depth < 2 ? 'pointer' : 'default');
 
-      // Rect
+      // Build each node
       nodeEnter.each(function(d: any) {
         const el = d3.select<SVGGElement, any>(this);
         const lines: string[] = d.data.name.split('\n');
         const isRoot = d.depth === 0;
         const isBranch = d.depth === 1;
+        const isLeaf = d.depth === 2;
         const w = isRoot ? 120 : isBranch ? 128 : 118;
         const h = isRoot ? 58 : lines.length > 1 ? 50 : 36;
+        const branchIdx = getBranchIdx(d);
 
-        // Shadow rect — skip on mobile for performance
+        // Shadow rect — lightweight alternative to SVG filters
         if (!isMobile) {
           el.append('rect')
             .attr('x', -w / 2 + 2).attr('y', -h / 2 + 3)
             .attr('width', w).attr('height', h)
             .attr('rx', 14).attr('ry', 14)
-            .attr('fill', 'rgba(0,0,0,0.15)');
+            .attr('fill', 'rgba(0,0,0,0.12)');
         }
 
-        // Main rect
+        // Main rect — glassmorphism look via opacity
         el.append('rect').attr('class', 'node-rect')
           .attr('x', -w / 2).attr('y', -h / 2)
           .attr('width', w).attr('height', h)
           .attr('rx', 14).attr('ry', 14)
           .attr('fill', getColor(d))
-          .attr('stroke', 'rgba(255,255,255,0.7)')
+          .attr('fill-opacity', isRoot ? 0.92 : isBranch ? 0.85 : 0.75)
+          .attr('stroke', 'rgba(255,255,255,0.55)')
           .attr('stroke-width', isRoot ? 2.5 : 1.5);
 
-          if (isRoot && !isMobile) {
-            el.select('.node-rect').style('filter', 'url(#pulse)');
-          }
+        // Inner highlight — top edge gleam for glass effect
+        if (!isMobile) {
+          el.append('rect')
+            .attr('x', -w / 2 + 4).attr('y', -h / 2 + 1)
+            .attr('width', w - 8).attr('height', h * 0.35)
+            .attr('rx', 12).attr('ry', 12)
+            .attr('fill', 'rgba(255,255,255,0.20)')
+            .attr('pointer-events', 'none');
+        }
+
 
         lines.forEach((line: string, i: number) => {
           el.append('text')
@@ -241,7 +318,7 @@ const treeLayout = d3.tree<NodeData>()
           el.append('circle').attr('class', 'collapse-dot')
             .attr('cx', w / 2 - 2).attr('cy', -h / 2 + 2)
             .attr('r', 5)
-            .attr('fill', DARK_COLORS[getBranchIdx(d) % DARK_COLORS.length])
+            .attr('fill', DARK_COLORS[branchIdx % DARK_COLORS.length])
             .attr('stroke', 'white').attr('stroke-width', 1.5);
         }
       });
@@ -249,12 +326,15 @@ const treeLayout = d3.tree<NodeData>()
       // Hover
       nodeEnter
         .on('mouseover', function(event: MouseEvent, d: any) {
+          d3.select<SVGGElement, any>(this).raise();
           d3.select<SVGGElement, any>(this).select('.node-rect')
             .transition().duration(150)
-            .attr('filter', 'url(#glow)')
-            .attr('transform', 'scale(1.15)');
+            .attr('fill-opacity', 1)
+            .attr('stroke', 'rgba(255,255,255,0.9)')
+            .attr('stroke-width', 2.5)
+            .attr('transform', 'scale(1.12)');
           d3.select<SVGGElement, any>(this).selectAll('text')
-            .transition().duration(150).attr('transform', 'scale(1.15)');
+            .transition().duration(150).attr('transform', 'scale(1.12)');
           if (!isMobile) {
             tooltip.style.opacity = '1';
             tooltip.textContent = d.data.name.replace('\n', ' ');
@@ -266,16 +346,27 @@ const treeLayout = d3.tree<NodeData>()
             tooltip.style.top = (event.clientY - 10) + 'px';
           })
         .on('mouseout', function() {
+          const d: any = d3.select<SVGGElement, any>(this).datum();
+          const isRoot = d.depth === 0;
+          const isBranch = d.depth === 1;
           d3.select<SVGGElement, any>(this).select('.node-rect')
-            .transition().duration(200)
-            .attr('filter', null).attr('transform', null);
+            .transition().duration(250)
+            .attr('fill-opacity', isRoot ? 0.92 : isBranch ? 0.85 : 0.75)
+            .attr('stroke', 'rgba(255,255,255,0.55)')
+            .attr('stroke-width', isRoot ? 2.5 : 1.5)
+            .attr('transform', null);
           d3.select<SVGGElement, any>(this).selectAll('text')
-            .transition().duration(200).attr('transform', null);
+            .transition().duration(250).attr('transform', null);
             if (!isMobile) tooltip.style.opacity = '0';
         })
-        // Click to collapse/expand branch
+        // Click to collapse/expand branch + ripple
         .on('click', function(_: any, d: any) {
           if (d.depth !== 1) return;
+          // Spawn ripple at node position
+          const [nx, ny] = d3.pointRadial(d.x, d.y);
+          const color = DARK_COLORS[getBranchIdx(d) % DARK_COLORS.length];
+          spawnRipple(nx, ny, color);
+
           if (d.children) {
             (d as any)._children = d.children;
             d.children = undefined;
@@ -285,12 +376,15 @@ const treeLayout = d3.tree<NodeData>()
           }
           update(true);
         })
-        // Touch fallback for real mobile — d3.zoom swallows touch events,
-        // so we intercept touchend directly and stop propagation.
+        // Touch fallback for real mobile
         .on('touchend', function(event: TouchEvent, d: any) {
           if (d.depth !== 1) return;
           event.stopPropagation();
           event.preventDefault();
+          const [nx, ny] = d3.pointRadial(d.x, d.y);
+          const color = DARK_COLORS[getBranchIdx(d) % DARK_COLORS.length];
+          spawnRipple(nx, ny, color);
+
           if (d.children) {
             (d as any)._children = d.children;
             d.children = undefined;
@@ -301,13 +395,13 @@ const treeLayout = d3.tree<NodeData>()
           update(true);
         });
 
-      // Replace the node transition block
+      // Animate nodes into position
       const nodeUpdate = nodeEnter.merge(nodes as any);
-      (animate ? (nodeUpdate.transition().duration(500).ease(d3.easeCubicOut) as any) : (nodeUpdate as any))
+      (animate ? (nodeUpdate.transition().duration(600).ease(d3.easeCubicOut) as any) : (nodeUpdate as any))
         .attr('transform', (d: any) => `translate(${d3.pointRadial(d.x, d.y)})`)
         .style('opacity', 1);
 
-      nodes.exit().transition().duration(300).style('opacity', 0).remove();
+      nodes.exit().transition().duration(400).style('opacity', 0).remove();
     }
 
 
@@ -334,34 +428,41 @@ if (!isMobile) {
   if (hint) hint.textContent = 'Scroll · Drag · Click';
 }
 
-    // // Initial center + render
-    // g.attr('transform', `translate(${width / 2}, ${height / 2})`);
-    // svg.call(zoomBehavior.transform, d3.zoomIdentity.translate(width / 2, height / 2));
-    // update(false);
-
-    // Staggered entrance animation
+    // Staggered entrance animation with scale bounce
     nodeGroup.selectAll<SVGGElement, any>('g.node')
       .style('opacity', 0)
-      .transition().duration(600)
-      .delay((_: any, i: number) => i * 30)
-      .ease(d3.easeBackOut.overshoot(1.2))
-      .style('opacity', 1);
+      .attr('transform', (d: any) => {
+        const [x, y] = d3.pointRadial(d.x, d.y);
+        return `translate(${x}, ${y}) scale(0.3)`;
+      })
+      .transition().duration(700)
+      .delay((_: any, i: number) => i * 40)
+      .ease(d3.easeBackOut.overshoot(1.4))
+      .style('opacity', 1)
+      .attr('transform', (d: any) => `translate(${d3.pointRadial(d.x, d.y)})`);
+
+    // Staggered link draw-in on initial load
+    linkGroup.selectAll<SVGPathElement, any>('path.link')
+      .each(function(d: any, i: number) {
+        const pathEl = this as SVGPathElement;
+        const len = pathEl.getTotalLength();
+        d3.select(pathEl)
+          .attr('stroke-dasharray', `${len} ${len}`)
+          .attr('stroke-dashoffset', len)
+          .transition().duration(800)
+          .delay(i * 35)
+          .ease(d3.easeCubicOut)
+          .attr('stroke-dashoffset', 0)
+          .on('end', function() {
+            d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+          });
+      });
 
     // Reset button
       document.getElementById('reset-btn')!.addEventListener('click', () => {
         svg.transition().duration(600).ease(d3.easeCubicOut)
           .call(zoomBehavior.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(mobileScale));
       });
-
-// Resize
-    // window.addEventListener('resize', () => {
-    //   width = window.innerWidth;
-    //   height = window.innerHeight;
-    //   radius = Math.min(width, height) * 0.40;
-    //   treeLayout.size([2 * Math.PI, radius]);
-    //   g.attr('transform', `translate(${width / 2}, ${height / 2})`);
-    //   update(false);
-    // });
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && isMobile) {
