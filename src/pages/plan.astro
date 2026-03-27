@@ -14,8 +14,8 @@ import DecryptText from "../components/DecryptText.astro";
       }
     </style>
 
-<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;">
-  <svg id="mindmap" style="width:100%;height:100%; pointer-events: all;"></svg>
+<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: auto;">
+  <svg id="mindmap" style="width:100%;height:100%; cursor: grab; touch-action: none;"></svg>
 </div>
 
   <!-- Controls -->
@@ -91,6 +91,13 @@ import DecryptText from "../components/DecryptText.astro";
 
     const tooltip = document.getElementById('tooltip')!;
     const svg = d3.select<SVGSVGElement, unknown>('#mindmap');
+    
+    // Transparent rect to catch zoom and pan events in Chrome
+    svg.append('rect')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', 'transparent');
+
     let width = window.innerWidth;
     let height = window.innerHeight;
 
@@ -242,10 +249,6 @@ const treeLayout = d3.tree<NodeData>()
       // Hover
       nodeEnter
         .on('mouseover', function(event: MouseEvent, d: any) {
-          // Bring this node to front by re-appending it
-          const parent = (this as SVGGElement).parentNode!;
-          parent.appendChild(this as SVGGElement);
-
           d3.select<SVGGElement, any>(this).select('.node-rect')
             .transition().duration(150)
             .attr('filter', 'url(#glow)')
