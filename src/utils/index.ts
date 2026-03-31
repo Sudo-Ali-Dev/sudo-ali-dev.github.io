@@ -1,6 +1,9 @@
 import type { CollectionEntry } from "astro:content";
 import path from "path";
 
+const blogImages = import.meta.glob("../content/blog/**/*.{webp,jpg,png,svg,gif,avif,jpeg}");
+const supportedImageExtensions = [".webp", ".jpg", ".png", ".svg", ".gif", ".avif", ".jpeg"];
+
 export function sortMDByDate(posts: CollectionEntry<"blog">[] = []) {
   return posts.sort(
     (a, b) =>
@@ -9,27 +12,24 @@ export function sortMDByDate(posts: CollectionEntry<"blog">[] = []) {
   );
 }
 
-export function getBlogImage(slug: string, fileName: string) {
-  const filename = path.parse(fileName);
-  const name = filename.name;
-  const ext = filename.ext;
+export function getBlogImage(contentId: string, fileName: string) {
+  const normalizedContentId = contentId.replaceAll("\\", "/");
+  const contentDirectory = path.posix.dirname(normalizedContentId);
+  const normalizedFileName = fileName.replaceAll("\\", "/").replace(/^\.\//, "");
+  const requestedExt = path.posix.extname(normalizedFileName).toLowerCase();
+  const imagePathWithoutExt = requestedExt
+    ? normalizedFileName.slice(0, -requestedExt.length)
+    : normalizedFileName;
+  const imageExt = supportedImageExtensions.includes(requestedExt)
+    ? requestedExt
+    : ".jpg";
+  const imageDirectory = contentDirectory === "." ? "" : `${contentDirectory}/`;
+  const imagePath = `../content/blog/${imageDirectory}${imagePathWithoutExt}${imageExt}`;
+  const importer = blogImages[imagePath];
 
-  switch (ext) {
-    case ".webp":
-      return import(`../content/blog/${slug}/${name}.webp`);
-    case ".jpg":
-      return import(`../content/blog/${slug}/${name}.jpg`);
-    case ".png":
-      return import(`../content/blog/${slug}/${name}.png`);
-    case ".svg":
-      return import(`../content/blog/${slug}/${name}.svg`);
-    case ".gif":
-      return import(`../content/blog/${slug}/${name}.gif`);
-    case ".avif":
-      return import(`../content/blog/${slug}/${name}.avif`);
-    case ".jpeg":
-      return import(`../content/blog/${slug}/${name}.jpeg`);
-    default:
-      return import(`../content/blog/${slug}/${name}.jpg`);
+  if (!importer) {
+    throw new Error(`Blog image not found for ${contentId}: ${fileName}`);
   }
+
+  return importer();
 }

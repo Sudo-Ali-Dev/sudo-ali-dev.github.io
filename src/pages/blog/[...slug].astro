@@ -24,7 +24,7 @@ const stats = readingTime(entry.body || '');
 
 let heroImage;
 if (post.heroImage) {
-    heroImage = await getBlogImage(entry.slug, post?.heroImage);
+    heroImage = await getBlogImage(entry.id, post?.heroImage);
 }
 
 ---
