@@ -42,19 +42,29 @@ const projects: Array<{
   title: string;
   description: string;
   link: string;
-  icon: string;
+  icon?: string;
+  logoSrc?: string;
+  logoAlt?: string;
 }> = [
   {
-    title: "todo-cli",
-    description: "Command-line todo manager using JSON for storage, built with Python.",
-    link: "https://github.com/Sudo-Ali-Dev/todo-cli",
+    title: "Portfolio Website & Know Me AI",
+    description: "A personal portfolio with an interactive mindmap, D3.js visualizations, and Know Me — an AI chatbot with a custom RAG-lite pipeline powered by Llama 3.3 70B via Groq API.",
+    link: "https://sudoali.dev",
     icon: ">_",
   },
   {
-    title: "GitTracker",
-    description: "A simple CLI tool that fetches and displays the recent activity of any GitHub user using the GitHub API.",
-    icon: "🛰️",
-    link: "https://github.com/Sudo-Ali-Dev/GitTracker",
+    title: "Rankistan",
+    description: "The definitive index of Pakistani open source developers, auto-updated daily via GitHub Actions with AI-powered summaries, an interactive map, and ranked leaderboard.",
+    logoSrc: "/logos/rankistan.svg",
+    logoAlt: "Rankistan logo",
+    link: "https://rankistan.dev",
+  },
+  {
+    title: "Mehngai Monitor",
+    description: "Mehngai Monitor is a data pipeline and web dashboard that scrapes official Lahore government rate sheets daily, extracts structured commodity prices via the Gemini API, and serves them through a clean analytics interface.",
+    logoSrc: "/logos/mehngai-monitor.svg",
+    logoAlt: "Mehngai Monitor logo",
+    link: "https://mehngai.duckdns.org",
   },
 ];
 ---
@@ -165,6 +175,8 @@ const projects: Array<{
                 description={project.description}
                 link={project.link}
                 icon={project.icon}
+                logoSrc={project.logoSrc}
+                logoAlt={project.logoAlt}
                 index={index}
               />
             ))
