@@ -1,0 +1,17 @@
+{
+  "year": 2026,
+  "title": "Portfolio Website & Know Me AI",
+  "technologies": [
+    "RAG Pipeline",
+    "Groq API (Llama 3.3 70B)",
+    "AI Chatbot",
+    "REST API",
+    "Astro",
+    "TypeScript",
+    "D3.js",
+    "Vercel",
+    "REST API",
+    "Vercel"
+  ],
+  "live": "https://sudoali.dev"
+}

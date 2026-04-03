@@ -1,0 +1,7 @@
+{
+  "year": 2026,
+  "title": "Rankistan",
+  "technologies": ["React", "Node.js", "Vite", "Tailwind CSS", "GitHub API", "Cloudflare Workers", "GitHub Actions", "Groq API"],
+  "github": "https://github.com/Sudo-Ali-Dev/Rankistan",
+  "live": "https://rankistan.dev"
+}

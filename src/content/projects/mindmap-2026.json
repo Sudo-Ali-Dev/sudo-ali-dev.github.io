@@ -1,7 +1,7 @@
 {
   "year": 2026,
-  "title": "My 2026 Mind Map",
-  "technologies": ["astro, d3.js, claude"],
+  "title": "My 2026",
+  "technologies": ["astro", "d3.js", "claude"],
   "github": "https://github.com/Sudo-Ali-Dev",
   "live": "https://sudoali.dev/plan"
 }

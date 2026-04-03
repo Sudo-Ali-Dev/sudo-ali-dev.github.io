@@ -1,0 +1,7 @@
+{
+  "year": 2026,
+  "title": "Mehngai Monitor",
+  "technologies": ["Python", "FastAPI", "SQLite", "Gemini OCR", "BeautifulSoup", "APScheduler", "Plotly", "Jinja2", "Tailwind CSS"],
+  "github": "https://github.com/Sudo-Ali-Dev/Mehngai-Monitor",
+  "live": "https://mehngai.duckdns.org"
+}
