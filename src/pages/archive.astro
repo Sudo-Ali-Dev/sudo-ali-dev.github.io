@@ -8,7 +8,29 @@ import ProjectList from "../components/ui/ProjectList.astro";
 import DecryptText from "../components/DecryptText.astro";
 
 const allProjects = await getCollection("projects");
-const allProjectsByDate = allProjects.sort((a, b) => b.data.year - a.data.year);
+const preferredOrder = [
+  "Portfolio Website & Know Me AI",
+  "Rankistan",
+  "Mehngai Monitor",
+  "HypoSnitch",
+  "My 2026",
+  "GitTracker",
+];
+
+const orderIndex = new Map(preferredOrder.map((title, index) => [title, index]));
+
+const allProjectsByDate = allProjects.sort((a, b) => {
+  const aIndex = orderIndex.get(a.data.title);
+  const bIndex = orderIndex.get(b.data.title);
+
+  if (aIndex !== undefined || bIndex !== undefined) {
+    if (aIndex === undefined) return 1;
+    if (bIndex === undefined) return -1;
+    return aIndex - bIndex;
+  }
+
+  return b.data.year - a.data.year || a.data.title.localeCompare(b.data.title);
+});
 ---
 
 <BaseLayout title="Archive" navbarActiveItemID="archive">
