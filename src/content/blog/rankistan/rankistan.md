@@ -1,8 +1,8 @@
 ---
-publishDate: 2026-04-03
+publishDate: 2026-04-04
 title: We Were Always Here
 description: nobody indexed us so I did
-heroImage: pakdev.png
+heroImage: rankistan.png
 published: true
 ---
 
@@ -12,6 +12,6 @@ I went looking. It wasn't there.
 
 So I drew it. Scraped GitHub, scored by actual activity, refreshes every hour. Turns out we're everywhere. Just unindexed — invisible to each other.
 
-PakDev Index is live. If you've been shipping, you might already be on it.
+Rankistan is live. If you've been shipping, you might already be on it.
 
-Link's on the projects page.
+Here's the link: [Rankistan.Dev](https://rankistan.dev)
