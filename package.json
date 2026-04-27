@@ -1,11 +1,11 @@
 {
-  "name": "terminus-astro-template",
-  "description": "Astro template for developers",
-  "author": "ojoanalogo",
+  "name": "sudo-ali-dev",
+  "description": "Muhammad Ali's Portfolio - Chase Entropy.",
+  "author": "Muhammad Ali",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ojoanalogo/terminus-astro-template"
+    "url": "https://github.com/Sudo-Ali-Dev/sudo-ali-dev.github.io"
   },
   "type": "module",
   "version": "0.0.1",
