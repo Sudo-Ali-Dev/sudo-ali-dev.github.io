@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DecryptText from "../components/DecryptText.astro";
-
+import { sitePageTitle } from "../config";
 ---
 
-<BaseLayout title="My 2026 Plan">
+<BaseLayout
+  title={sitePageTitle("My 2026 Plan")}
+  description="A living mindmap of goals and focus areas for 2026 — personal planning."
+>
 
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 

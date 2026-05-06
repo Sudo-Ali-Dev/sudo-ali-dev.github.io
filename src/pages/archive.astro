@@ -6,6 +6,7 @@ import TerminalPrompt from "../components/ui/TerminalPrompt.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import ProjectList from "../components/ui/ProjectList.astro";
 import DecryptText from "../components/DecryptText.astro";
+import { sitePageTitle } from "../config";
 
 const allProjects = await getCollection("projects");
 const preferredOrder = [
@@ -33,7 +34,11 @@ const allProjectsByDate = allProjects.sort((a, b) => {
 });
 ---
 
-<BaseLayout title="Archive" navbarActiveItemID="archive">
+<BaseLayout
+  title={sitePageTitle("Archive")}
+  description="Selected projects — Rankistan, Mehngai Monitor, GitTracker, and more."
+  navbarActiveItemID="archive"
+>
   <section aria-label="Projects">
     <Card>
       <SectionHeading as="h1">

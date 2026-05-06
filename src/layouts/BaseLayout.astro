@@ -1,14 +1,32 @@
 ---
+import type { ImageMetadata } from "astro";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 
 import { SITE_DESCRIPTION, SITE_TITLE } from "../config";
+
+interface Props {
+  image?: string | ImageMetadata;
+  title?: string;
+  description?: string;
+  navbarActiveItemID?: string;
+  article?: boolean;
+  publishDate?: Date;
+  updatedDate?: string;
+  robots?: string;
+  structuredData?: Record<string, unknown>;
+}
 
 const {
   image,
   title = SITE_TITLE,
   description = SITE_DESCRIPTION,
   navbarActiveItemID,
+  article,
+  publishDate,
+  updatedDate,
+  robots,
+  structuredData,
 } = Astro.props;
 ---
 
@@ -18,7 +36,16 @@ const {
   class="bg-background text-secondary selection:bg-orange-600/80 selection:text-white"
 >
   <head>
-    <BaseHead title={title} description={description} image={image} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={image}
+      article={article}
+      publishDate={publishDate}
+      updatedDate={updatedDate}
+      robots={robots}
+      structuredData={structuredData}
+    />
     <script is:inline>
       (function () {
         const theme = localStorage.getItem("theme");

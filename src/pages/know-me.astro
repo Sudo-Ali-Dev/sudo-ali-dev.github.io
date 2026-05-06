@@ -4,9 +4,14 @@ import Card from "../components/ui/Card.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import TerminalPrompt from "../components/ui/TerminalPrompt.astro";
 import DecryptText from "../components/DecryptText.astro";
+import { sitePageTitle } from "../config";
 ---
 
-<BaseLayout title="Know Me" navbarActiveItemID="know-me">
+<BaseLayout
+  title={sitePageTitle("Know Me")}
+  description="Chat with a digital version of Ali — ask anything you'd ask in person."
+  navbarActiveItemID="know-me"
+>
   <section aria-label="Know Me">
     <Card>
       <SectionHeading as="h1">

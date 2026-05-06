@@ -7,13 +7,18 @@ import TerminalPrompt from "../../components/ui/TerminalPrompt.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import PostList from "../../components/ui/PostList.astro";
 import DecryptText from "../../components/DecryptText.astro";
+import { sitePageTitle } from "../../config";
 
 
 const allPosts = await getCollection("blog");
 const allPostsByDate = sortMDByDate(allPosts);
 ---
 
-<BaseLayout title="Blog" navbarActiveItemID="blog">
+<BaseLayout
+  title={sitePageTitle("Blog")}
+  description="Essays and notes — late-night thoughts, shipping, and software."
+  navbarActiveItemID="blog"
+>
   <section aria-label="Posts">
     <Card>
 <SectionHeading as="h1" class="inline-flex items-center gap-1.5">

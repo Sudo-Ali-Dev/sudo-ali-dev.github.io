@@ -9,6 +9,7 @@ import Tag from "../components/ui/Tag.astro";
 import TerminalPrompt from "../components/ui/TerminalPrompt.astro";
 import Divider from "../components/ui/Divider.astro";
 import DecryptText from "../components/DecryptText.astro";
+import { sitePageTitle } from "../config";
 
 export interface Props {
   title: string;
@@ -32,13 +33,17 @@ const {
 
 dayjs.extend(localizedFormat);
 const displayDate = dayjs(publishDate).format("LL");
+const pageTitle = sitePageTitle(title);
 ---
 
 <BaseLayout
-  title={title}
+  title={pageTitle}
   description={description}
   image={heroImage}
   navbarActiveItemID="blog"
+  article={true}
+  publishDate={publishDate}
+  updatedDate={updatedDate}
 >
   <Card class="md:p-8">
     {

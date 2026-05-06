@@ -7,6 +7,6 @@ export default defineConfig({
     sitemap(),
     tailwind(),
   ],
-  site: "http://sudoali.dev/",
+  site: "https://sudoali.dev/",
   compressHTML: true,
 });

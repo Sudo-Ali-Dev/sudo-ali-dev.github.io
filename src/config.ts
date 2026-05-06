@@ -1,8 +1,18 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 
-export const SITE_TITLE = "Muhammad Ali";
-export const SITE_DESCRIPTION = "Chase Entropy.";
+export const SITE_NAME = "Muhammad Ali";
+export const SITE_TITLE = SITE_NAME;
+
+export const SITE_URL = "https://sudoali.dev";
+
+export const SITE_DESCRIPTION =
+  "Portfolio and writing by Muhammad Ali — software projects, experiments, and occasional late-night thoughts. Chase entropy.";
+
+/** Title pattern for inner pages: `Blog — Muhammad Ali` */
+export function sitePageTitle(pageTitle: string) {
+  return `${pageTitle} — ${SITE_NAME}`;
+}
 
 export interface NavLink {
   title: string;

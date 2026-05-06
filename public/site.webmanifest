@@ -1,4 +1,11 @@
 {
+  "name": "Muhammad Ali — Portfolio",
+  "short_name": "Ali",
+  "description": "Portfolio and writing by Muhammad Ali — software projects, experiments, and occasional late-night thoughts.",
+  "start_url": "/",
+  "display": "browser",
+  "theme_color": "#f7f4ef",
+  "background_color": "#f7f4ef",
   "icons": [
     { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }

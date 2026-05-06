@@ -15,6 +15,31 @@ import Divider from "../components/ui/Divider.astro";
 import PostList from "../components/ui/PostList.astro";
 import EducationList from "../components/ui/EducationList.astro";
 import DecryptText from "../components/DecryptText.astro";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  SOCIAL_LINKS,
+  sitePageTitle,
+} from "../config";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+    },
+    {
+      "@type": "Person",
+      name: SITE_NAME,
+      url: SITE_URL,
+      sameAs: SOCIAL_LINKS.map((l) => l.url),
+    },
+  ],
+};
 
 const MAX_POSTS = 3;
 const allPosts = await getCollection("blog");
@@ -69,7 +94,11 @@ const projects: Array<{
 ];
 ---
 
-<BaseLayout navbarActiveItemID="home">
+<BaseLayout
+  navbarActiveItemID="home"
+  title={sitePageTitle("Portfolio")}
+  structuredData={structuredData}
+>
   <MatrixBackground
     slot="background"
     highlightColor="rgba(222, 133, 74, 0.2)"
