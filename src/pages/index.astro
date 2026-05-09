@@ -49,18 +49,16 @@ const allEducation = await getCollection("education");
 const allEducationByDate = allEducation.sort((a, b) => b.data.startYear - a.data.startYear);
 
 const techStack: Record<string, string> = {
-python: "python — my go-to",
-c: "c — it hurts",
-cpp: "c++ — it still hurts",
-git: "git — push and hope",
-astro: "astro — built this with it",
-node: "node — barely counts",
-html: "html/css — obviously",
-"claude-code": "claude code — my unpaid intern",
-gcp: "gcp — cloud stuff, I figure it out",
-wordpress: "wordpress — did this for a year",
-woocommerce: "woocommerce — never again",
-shopify: "shopify — never again x2",
+python: "python — my comfort language",
+tensorflow: "tensorflow — fighting shapes daily",
+pytorch: "pytorch — research paper speedrun",
+scikitlearn: "scikit-learn — classic and reliable",
+fastapi: "fastapi — APIs at lightspeed",
+rag: "rag — giving LLMs memory",
+lora: "lora/qlora — making GPUs suffer less",
+prompt: "prompt engineering — professionally talking to AI",
+docker: "docker — works on my container",
+aws: "aws — clicking random services confidently",
 };
 
 const projects: Array<{
