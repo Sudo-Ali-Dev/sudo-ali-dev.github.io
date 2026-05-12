@@ -4,6 +4,7 @@ import readingTime from 'reading-time';
 import type { BlogSchema } from '../../content/config';
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getBlogImage } from '../../utils';
+import { SITE_ALIAS, SITE_NAME, SITE_URL, SOCIAL_LINKS } from '../../config';
 
 export async function getStaticPaths() {
     const postEntries = await getCollection('blog');
@@ -27,6 +28,78 @@ if (post.heroImage) {
     heroImage = await getBlogImage(entry.id, post?.heroImage);
 }
 
+const siteUrl = new URL(SITE_URL);
+const postUrl = new URL(`/blog/${entry.slug}/`, siteUrl).href;
+const blogIndexUrl = new URL("/blog/", siteUrl).href;
+const defaultImageUrl = new URL("/share.jpg", siteUrl).href;
+const heroImageUrl = heroImage?.default?.src
+    ? new URL(heroImage.default.src, siteUrl).href
+    : defaultImageUrl;
+
+let updatedIso: string | undefined;
+if (post.updatedDate) {
+    const t = new Date(post.updatedDate).getTime();
+    if (!Number.isNaN(t)) {
+        updatedIso = new Date(t).toISOString();
+    }
+}
+
+const author = {
+    "@type": "Person",
+    name: SITE_NAME,
+    alternateName: SITE_ALIAS,
+    url: SITE_URL,
+    sameAs: SOCIAL_LINKS.map((l) => l.url),
+};
+
+const blogPosting = {
+    "@type": "BlogPosting",
+    "@id": `${postUrl}#article`,
+    headline: post.title,
+    description: post.description,
+    image: [heroImageUrl],
+    datePublished: post.publishDate.toISOString(),
+    ...(updatedIso ? { dateModified: updatedIso } : {}),
+    author,
+    publisher: author,
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+    url: postUrl,
+    wordCount: stats.words,
+    ...(post.tags && post.tags.length > 0 ? { keywords: post.tags.join(", ") } : {}),
+    articleSection: "blog",
+    inLanguage: "en-US",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+};
+
+const breadcrumbList = {
+    "@type": "BreadcrumbList",
+    "@id": `${postUrl}#breadcrumbs`,
+    itemListElement: [
+        {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: SITE_URL,
+        },
+        {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: blogIndexUrl,
+        },
+        {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: postUrl,
+        },
+    ],
+};
+
+const structuredData = {
+    "@graph": [blogPosting, breadcrumbList],
+};
+
 ---
 
 <PostLayout
@@ -37,6 +110,7 @@ if (post.heroImage) {
     heroImage={heroImage?.default}
     readingTime={stats.text}
     tags={post.tags}
+    structuredData={structuredData}
 >
     <Content/>
 </PostLayout>
