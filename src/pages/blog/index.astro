@@ -7,17 +7,52 @@ import TerminalPrompt from "../../components/ui/TerminalPrompt.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import PostList from "../../components/ui/PostList.astro";
 import DecryptText from "../../components/DecryptText.astro";
-import { sitePageTitle } from "../../config";
+import { SITE_URL, sitePageTitle } from "../../config";
 
 
 const allPosts = await getCollection("blog");
 const allPostsByDate = sortMDByDate(allPosts);
+const pageDescription = "Essays and notes — late-night thoughts, shipping, and software.";
+const blogIndexUrl = new URL("/blog/", SITE_URL).href;
+
+const structuredData = {
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": `${blogIndexUrl}#collection`,
+      url: blogIndexUrl,
+      name: sitePageTitle("Blog"),
+      description: pageDescription,
+      inLanguage: "en-US",
+      isPartOf: { "@id": `${SITE_URL}/#website` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${blogIndexUrl}#breadcrumbs`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: SITE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Blog",
+          item: blogIndexUrl,
+        },
+      ],
+    },
+  ],
+};
 ---
 
 <BaseLayout
   title={sitePageTitle("Blog")}
-  description="Essays and notes — late-night thoughts, shipping, and software."
+  description={pageDescription}
   navbarActiveItemID="blog"
+  structuredData={structuredData}
 >
   <section aria-label="Posts">
     <Card>
