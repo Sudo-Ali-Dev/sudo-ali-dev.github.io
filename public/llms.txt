@@ -1,0 +1,12 @@
+# llms.txt
+
+Site Name: Muhammad Ali (sudo ali)
+Site URL: https://sudoali.dev/
+Description: Portfolio and writing by Muhammad Ali (sudo ali).
+
+Canonical: https://sudoali.dev/
+Sitemap: https://sudoali.dev/sitemap-index.xml
+RSS: https://sudoali.dev/rss.xml
+Robots: https://sudoali.dev/robots.txt
+
+Contact: mailto:aliisreceiving@gmail.com
