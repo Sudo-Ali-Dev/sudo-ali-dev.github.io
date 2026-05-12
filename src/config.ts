@@ -2,16 +2,21 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 export const SITE_NAME = "Muhammad Ali";
+export const SITE_ALIAS = "sudo ali";
 export const SITE_TITLE = SITE_NAME;
 
 export const SITE_URL = "https://sudoali.dev";
 
 export const SITE_DESCRIPTION =
-  "Portfolio and writing by Muhammad Ali — software projects, experiments, and occasional late-night thoughts. Chase entropy.";
+  "Portfolio and writing by Muhammad Ali, also known as sudo ali — software projects, experiments, and occasional late-night thoughts. Chase entropy.";
 
 /** Title pattern for inner pages: `Blog — Muhammad Ali` */
 export function sitePageTitle(pageTitle: string) {
   return `${pageTitle} — ${SITE_NAME}`;
+}
+
+export function siteHomeTitle() {
+  return `${SITE_NAME} (${SITE_ALIAS}) — Portfolio`;
 }
 
 export interface NavLink {
