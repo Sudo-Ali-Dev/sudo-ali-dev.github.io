@@ -13,6 +13,9 @@ interface Props {
   article?: boolean;
   publishDate?: Date;
   updatedDate?: string;
+  tags?: string[];
+  section?: string;
+  authorUrl?: string;
   robots?: string;
   structuredData?: Record<string, unknown>;
 }
@@ -25,6 +28,9 @@ const {
   article,
   publishDate,
   updatedDate,
+  tags,
+  section,
+  authorUrl,
   robots,
   structuredData,
 } = Astro.props;
@@ -43,6 +49,9 @@ const {
       article={article}
       publishDate={publishDate}
       updatedDate={updatedDate}
+      tags={tags}
+      section={section}
+      authorUrl={authorUrl}
       robots={robots}
       structuredData={structuredData}
     />
