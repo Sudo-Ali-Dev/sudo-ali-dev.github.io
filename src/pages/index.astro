@@ -16,11 +16,12 @@ import PostList from "../components/ui/PostList.astro";
 import EducationList from "../components/ui/EducationList.astro";
 import DecryptText from "../components/DecryptText.astro";
 import {
+  SITE_ALIAS,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
   SOCIAL_LINKS,
-  sitePageTitle,
+  siteHomeTitle,
 } from "../config";
 
 const structuredData = {
@@ -28,13 +29,17 @@ const structuredData = {
   "@graph": [
     {
       "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_DESCRIPTION,
+      publisher: { "@id": `${SITE_URL}/#person` },
     },
     {
       "@type": "Person",
+      "@id": `${SITE_URL}/#person`,
       name: SITE_NAME,
+      alternateName: SITE_ALIAS,
       url: SITE_URL,
       sameAs: SOCIAL_LINKS.map((l) => l.url),
     },
@@ -101,7 +106,7 @@ const projects: Array<{
 
 <BaseLayout
   navbarActiveItemID="home"
-  title={sitePageTitle("Portfolio")}
+  title={siteHomeTitle()}
   structuredData={structuredData}
 >
   <MatrixBackground
@@ -125,6 +130,7 @@ const projects: Array<{
                   Hey, I'm <span class="text-primary font-medium">
                     <DecryptText  text="Muhammad Ali" speed={40}/>
                   </span>
+                  <span class="text-muted"> (aka {SITE_ALIAS})</span>
                 </h1>
                 <p class="text-muted text-xs">
                   I’m an engineer who builds things for the web.
