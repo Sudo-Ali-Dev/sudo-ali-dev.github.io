@@ -48,7 +48,7 @@ export const NAV_LINKS: NavLink[] = [
   },
   {
     title: "resume.pdf",
-    redirect: "https://drive.google.com/file/d/14RbBAQVDQhwDoLIgu2EzkaW_TYxIMl6T/view?usp=sharing",
+    redirect: "https://drive.google.com/file/d/1mtOZ2Wnmg_TxNfg-18qa79rx7kwBCVbp/view?usp=sharing",
     tooltip: "A very interesting page",
   },
 ];
